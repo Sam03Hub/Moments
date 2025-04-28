@@ -78,7 +78,7 @@ body {
   height: auto;
   display: block;
   object-fit: cover;
-  filter: blur(15px) !important;
+  /*filter: blur(15px) !important;*/
 
 }
 
