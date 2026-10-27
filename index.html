@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Moments</title>
 
   <!-- Typography: Inter for UI & Playfair Display for Editorial Titles -->
@@ -16,7 +16,7 @@
       --bg-primary: #ffffff;
       --bg-sidebar: #fbfbfb;
       --bg-surface: #f4f4f5;
-      --bg-display: #fbfbfb; /* Light mode canvas background */
+      --bg-display: #fbfbfb;
       --backdrop-filter: blur(48px) brightness(0.95) saturate(1.1);
       --backdrop-opacity: 0.35;
       --text-main: #18181b;
@@ -35,7 +35,7 @@
       --bg-primary: #09090b;
       --bg-sidebar: #121215;
       --bg-surface: #1f1f23;
-      --bg-display: #000000; /* Dark mode canvas background */
+      --bg-display: #000000;
       --backdrop-filter: blur(48px) brightness(0.35) saturate(1.2);
       --backdrop-opacity: 0.75;
       --text-main: #f4f4f5;
@@ -52,29 +52,40 @@
       padding: 0;
     }
 
-    html, body {
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
+    /* Mobile-first base: Allow clean native scrolling */
+    html {
+      width: 100%;
+      height: 100%;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
       font-family: var(--font-body);
       background-color: var(--bg-primary);
       color: var(--text-main);
       -webkit-font-smoothing: antialiased;
       transition: background-color 0.3s ease, color 0.3s ease;
+      overflow-x: hidden;
     }
 
-    /* Fixed Split-Screen Grid Layout */
+    /* Mobile Layout: Stacked vertically with fluid dimensions */
     .app-viewport {
       display: flex;
-      width: 100vw;
-      height: 100vh;
+      flex-direction: column;
+      width: 100%;
+      min-height: 100dvh;
       position: relative;
     }
 
-    /* Left Side: Dedicated Photo Canvas with Dynamic Mode Support */
+    /* Photo Container: Dynamic responsive height on mobile */
     .photo-display {
-      flex: 1;
-      height: 100vh;
+      width: 100%;
+      height: 54vh;
+      height: 54dvh;
+      min-height: 280px;
       position: relative;
       background-color: var(--bg-display);
       overflow: hidden;
@@ -83,6 +94,7 @@
       justify-content: center;
       user-select: none;
       transition: background-color 0.3s ease;
+      flex-shrink: 0;
     }
 
     /* Hardware-Accelerated Two-Layer Crossfading Backdrops */
@@ -95,7 +107,7 @@
       background-size: cover;
       background-position: center;
       filter: var(--backdrop-filter);
-      transform: scale(1.1) translateZ(0); /* Hardware accelerate & cache raster */
+      transform: scale(1.1) translateZ(0);
       will-change: opacity, transform;
       opacity: 0;
       pointer-events: none;
@@ -119,58 +131,54 @@
       filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.25));
     }
 
-    /* Navigation Overlay Arrows on Left Container */
+    /* Navigation Overlay Arrows: Touch-friendly base */
     .nav-arrow {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      width: 52px;
-      height: 52px;
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(0, 0, 0, 0.3);
+      background: rgba(0, 0, 0, 0.38);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 50%;
       color: #ffffff;
       cursor: pointer;
-      opacity: 0;
+      opacity: 0.9;
       transition: var(--transition-smooth);
       z-index: 10;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .photo-display:hover .nav-arrow {
-      opacity: 0.85;
+    .nav-arrow:active {
+      transform: translateY(-50%) scale(0.95);
+      background: rgba(0, 0, 0, 0.65);
     }
 
-    .nav-arrow:hover {
-      opacity: 1 !important;
-      background: rgba(0, 0, 0, 0.6);
-      transform: translateY(-50%) scale(1.06);
-    }
+    .nav-prev { left: 14px; }
+    .nav-next { right: 14px; }
 
-    .nav-prev { left: 28px; }
-    .nav-next { right: 28px; }
-
-    /* Right Side: Fixed Editorial Sidebar */
+    /* Editorial Sidebar */
     .sidebar {
-      width: var(--sidebar-width);
-      min-width: var(--sidebar-width);
-      height: 100vh;
-      background-color: var(--bg-sidebar);
-      border-left: 1px solid var(--border-color);
+      width: 100%;
       display: flex;
       flex-direction: column;
+      background-color: var(--bg-sidebar);
+      border-top: 1px solid var(--border-color);
       position: relative;
       z-index: 20;
+      flex: 1 1 auto;
       transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
-    /* Sidebar Header: App Title, Actions & Clean Minimal Counter */
     .sidebar-header {
-      padding: 28px 32px;
+      padding: 18px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -188,10 +196,9 @@
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
     }
 
-    /* Minimal Text Indicator Counter — Updated to normal font style and regular weight */
     .counter-indicator {
       font-family: var(--font-body);
       font-size: 0.82rem;
@@ -209,9 +216,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      min-width: 38px;
+      min-height: 38px;
       padding: 6px;
       border-radius: 6px;
       transition: var(--transition-smooth);
+      -webkit-tap-highlight-color: transparent;
     }
 
     .action-btn:hover {
@@ -219,20 +229,17 @@
       background-color: var(--bg-surface);
     }
 
-    /* Middle Scrollable Section: Title, Date, Description */
+    /* Content Area */
     .sidebar-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 40px 32px 32px;
+      padding: 24px 20px;
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 16px;
     }
 
-    /* Date Typography — Updated to normal font style, body font, and normal case */
     .meta-date {
       font-family: var(--font-body);
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 400;
       font-style: normal;
       text-transform: none;
@@ -242,14 +249,14 @@
 
     .meta-title {
       font-family: var(--font-title);
-      font-size: 2.35rem;
+      font-size: 1.85rem;
       font-weight: 400;
-      line-height: 1.22;
+      line-height: 1.25;
       color: var(--text-main);
       letter-spacing: -0.01em;
+      word-wrap: break-word;
     }
 
-    /* Author wrapper styles preserved when re-enabled */
     .meta-author-wrap {
       display: flex;
       align-items: center;
@@ -267,24 +274,25 @@
       width: 32px;
       height: 1px;
       background-color: var(--border-color);
-      margin: 4px 0;
+      margin: 2px 0;
     }
 
     .meta-description {
-      font-size: 0.95rem;
-      line-height: 1.7;
+      font-size: 0.92rem;
+      line-height: 1.65;
       color: var(--text-muted);
       font-weight: 300;
     }
 
-    /* Fixed Bottom Container: Location and Tags */
+    /* Footer Container */
     .sidebar-footer-fixed {
-      padding: 24px 32px 28px;
+      padding: 18px 20px;
       border-top: 1px solid var(--border-color);
       background-color: var(--bg-sidebar);
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
+      margin-top: auto;
       transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
@@ -310,6 +318,7 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      word-break: break-word;
     }
 
     .tags-list {
@@ -334,36 +343,83 @@
       color: var(--text-main);
     }
 
-    /* Mobile Responsive */
-    @media (max-width: 900px) {
+    /* ==========================================================================
+       Desktop Breakpoint (Screens >= 992px)
+       Restores strict side-by-side split screen with independent internal scroll
+       ========================================================================== */
+    @media (min-width: 992px) {
+      html, body {
+        height: 100vh;
+        overflow: hidden;
+      }
+
       .app-viewport {
-        flex-direction: column;
-        overflow-y: auto;
-        height: auto;
+        flex-direction: row;
+        height: 100vh;
       }
 
       .photo-display {
-        width: 100vw;
-        height: 60vh;
-        flex: none;
-      }
-
-      .sidebar {
-        width: 100vw;
-        min-width: 100vw;
-        height: auto;
-        border-left: none;
-        border-top: 1px solid var(--border-color);
-      }
-
-      .sidebar-footer-fixed {
-        position: static;
+        flex: 1;
+        height: 100vh;
+        min-height: unset;
       }
 
       .nav-arrow {
-        opacity: 0.9;
-        width: 44px;
-        height: 44px;
+        opacity: 0;
+        width: 52px;
+        height: 52px;
+      }
+
+      .photo-display:hover .nav-arrow {
+        opacity: 0.85;
+      }
+
+      .nav-arrow:hover {
+        opacity: 1 !important;
+        transform: translateY(-50%) scale(1.06);
+      }
+
+      .nav-prev { left: 28px; }
+      .nav-next { right: 28px; }
+
+      .sidebar {
+        width: var(--sidebar-width);
+        min-width: var(--sidebar-width);
+        max-width: var(--sidebar-width);
+        height: 100vh;
+        border-top: none;
+        border-left: 1px solid var(--border-color);
+        flex: none;
+      }
+
+      .sidebar-header {
+        padding: 28px 32px;
+      }
+
+      .header-actions {
+        gap: 16px;
+      }
+
+      .sidebar-content {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        padding: 40px 32px 32px;
+        gap: 24px;
+      }
+
+      .meta-title {
+        font-size: 2.35rem;
+        line-height: 1.22;
+      }
+
+      .meta-description {
+        font-size: 0.95rem;
+        line-height: 1.7;
+      }
+
+      .sidebar-footer-fixed {
+        padding: 24px 32px 28px;
+        flex-shrink: 0;
       }
     }
   </style>
@@ -371,16 +427,16 @@
 <body>
 
   <div class="app-viewport">
-    <!-- Left Photo Viewport -->
+    <!-- Photo Viewport -->
     <main class="photo-display" id="photoDisplay">
-      <!-- Dual Layered Blurred Backdrops for Seamless Stutter-Free Crossfades -->
+      <!-- Dual Layered Blurred Backdrops -->
       <div class="photo-backdrop active" id="bgLayerA"></div>
       <div class="photo-backdrop" id="bgLayerB"></div>
 
       <!-- Main Photo -->
       <img src="" alt="" class="main-image" id="mainPhoto" />
 
-      <!-- Navigation Arrows Overlay -->
+      <!-- Navigation Overlay Arrows -->
       <button class="nav-arrow nav-prev" id="btnPrev" aria-label="Previous Photo">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="15 18 9 12 15 6"></polyline>
@@ -394,14 +450,13 @@
       </button>
     </main>
 
-    <!-- Right Fixed Editorial Sidebar -->
+    <!-- Editorial Sidebar -->
     <aside class="sidebar">
-      <!-- Fixed Header Bar -->
+      <!-- Header Bar -->
       <div class="sidebar-header">
         <div class="brand-title">Moments</div>
         
         <div class="header-actions">
-          <!-- Simplified Minimal Counter -->
           <div class="counter-indicator" id="photoCounter">01 / 04</div>
 
           <!-- Fullscreen Toggle Button -->
@@ -434,11 +489,11 @@
         </div>
       </div>
 
-      <!-- Core Content: Title, Date, Description (Clean Editorial) -->
+      <!-- Main Meta Content -->
       <div class="sidebar-content">
         <span class="meta-date" id="photoDate">October 14, 2026</span>
         <h1 class="meta-title" id="photoTitle">Misty Alpine Pass</h1>
-        
+
         <!-- [TEMPORARILY DISABLED: Captured by]
         <div class="meta-author-wrap">
           <span>Captured by</span>
@@ -453,7 +508,7 @@
         </p>
       </div>
 
-      <!-- Fixed Stationary Container: Location & Tags -->
+      <!-- Fixed Container: Location & Tags -->
       <div class="sidebar-footer-fixed">
         <div class="fixed-row">
           <span class="fixed-label">Location</span>
@@ -525,7 +580,7 @@
       }
     ];
 
-    // Preload all local photos into browser RAM to eliminate fetch latency
+    // Preload all local photos into browser cache
     PHOTOS.forEach(p => {
       const preloadImg = new Image();
       preloadImg.src = p.src;
@@ -543,10 +598,10 @@
       photoCounter: document.getElementById('photoCounter'),
       photoTitle: document.getElementById('photoTitle'),
       photoDate: document.getElementById('photoDate'),
-      photoAuthor: document.getElementById('photoAuthor'), // safely returns null when commented out
+      photoAuthor: document.getElementById('photoAuthor'),
       photoDesc: document.getElementById('photoDesc'),
       photoLocationText: document.getElementById('photoLocation')?.querySelector('span'),
-      tagContainer: document.getElementById('tagContainer'), // safely returns null when commented out
+      tagContainer: document.getElementById('tagContainer'),
       btnPrev: document.getElementById('btnPrev'),
       btnNext: document.getElementById('btnNext'),
       btnFullscreen: document.getElementById('btnFullscreen'),
@@ -555,6 +610,7 @@
       iconExitFS: document.getElementById('iconExitFS'),
       iconMoon: document.getElementById('iconMoon'),
       iconSun: document.getElementById('iconSun'),
+      photoDisplay: document.getElementById('photoDisplay')
     };
 
     /* Render Function with Zero-Lag Crossfade & Null-Safe Checks */
@@ -572,12 +628,10 @@
         dom.photoLocationText.textContent = data.location;
       }
 
-      // Safeguarded for when author is re-enabled
       if (dom.photoAuthor) {
         dom.photoAuthor.textContent = data.author || '';
       }
 
-      // Safeguarded for when tags are re-enabled (avoids JS errors while commented out)
       if (dom.tagContainer) {
         dom.tagContainer.innerHTML = '';
         if (Array.isArray(data.tags)) {
@@ -592,7 +646,7 @@
         }
       }
 
-      // Dual-layer crossfade: Set image on incoming layer, then switch active class
+      // Dual-layer crossfade
       const currentLayer = activeBgIsA ? dom.bgLayerA : dom.bgLayerB;
       const nextLayer = activeBgIsA ? dom.bgLayerB : dom.bgLayerA;
 
@@ -635,6 +689,28 @@
         prevPhoto();
       }
     });
+
+    // Mobile Swipe Gestures on Photo Container
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    dom.photoDisplay.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    dom.photoDisplay.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, { passive: true });
+
+    function handleSwipe() {
+      const threshold = 40;
+      if (touchEndX < touchStartX - threshold) {
+        nextPhoto();
+      } else if (touchEndX > touchStartX + threshold) {
+        prevPhoto();
+      }
+    }
 
     // Fullscreen Toggle
     dom.btnFullscreen.addEventListener('click', () => {
