@@ -1,2 +1,0 @@
-# Moments
-My Moments Website
